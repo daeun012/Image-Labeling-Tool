@@ -165,7 +165,7 @@ body {
   opacity: 1;
 }
 
-.toolBar .draggedButton {
+.toolBar .selectButton {
   position: absolute;
   top: 112px;
   left: 8px;
@@ -173,6 +173,11 @@ body {
   height: 40px;
   background: transparent url('img/Toolbar_select.svg') 0% 0% no-repeat padding-box;
   opacity: 1;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.selectButton:hover {
+  background-color: #ebedf2;
 }
 
 .toolBar .createButton {
@@ -183,6 +188,15 @@ body {
   height: 40px;
   background: transparent url('img/Bounding_Box_Create.svg') 0% 0% no-repeat padding-box;
   opacity: 1;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.createButton:hover {
+  background-color: #ebedf2;
+}
+
+.buttonActive {
+  background-color: #ebedf2 !important;
 }
 
 .board {
