@@ -77,7 +77,6 @@ body {
   font-family: 'Noto Sans Display', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
 }
 
 .App {
@@ -200,9 +199,20 @@ body {
 }
 
 .board {
-  position: fixed;
+  position: absolute;
   top: 104px;
   left: 56px;
   width: 100%;
-  height: 100%;
+  width: 100%;
+}
+
+.label {
+  position: absolute;
+  user-select: none;
+  border: 2px solid #5668d9;
+  background-color: rgba(235, 237, 242, 0.5);
+  left: 1px;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
 }

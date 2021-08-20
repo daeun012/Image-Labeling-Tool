@@ -5,7 +5,7 @@ import ToolBar from './components/ToolBar';
 import Board from './components/Board';
 
 const App = () => {
-  const [mode, activeMode] = useState('select');
+  const [mode, activeMode] = useState('create');
   return (
     <div className="App">
       <TitleBar />
