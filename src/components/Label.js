@@ -1,6 +1,7 @@
-const Label = ({ data, imgSize, selected }) => {
-  const { x, y, x2, y2 } = data;
+import React from 'react';
 
+const Label = ({ index, data, imgSize, handleLabelDrag }) => {
+  const { x, y, x2, y2 } = data;
   const { imgWidth, imgHeight } = imgSize;
 
   const dimensions = {
@@ -10,16 +11,11 @@ const Label = ({ data, imgSize, selected }) => {
     height: Math.abs(Math.round((y2 - y) * imgHeight)),
   };
 
-  return selected ? (
-    <div className="label" style={dimensions}>
-      <div className="topLeft" />
-      <div className="topRight" />
-      <div className="bottomRight" />
-      <div className="bottomLeft" />
-    </div>
-  ) : (
-    <div className="label" style={dimensions}></div>
-  );
+  const onLabelGrabbed = (e) => {
+    handleLabelDrag(e, index);
+  };
+
+  return handleLabelDrag ? <div className="label" style={dimensions} onMouseDown={onLabelGrabbed}></div> : <div className="label" style={dimensions}></div>;
 };
 
 export default Label;
