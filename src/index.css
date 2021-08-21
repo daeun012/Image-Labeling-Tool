@@ -209,6 +209,7 @@ body {
   user-select: none;
   background: rgba(86, 104, 217, 0.2) 0% 0% no-repeat padding-box;
   border: 3px solid #5668d9;
+  z-index: 5;
 }
 
 .labelCorner {
@@ -225,6 +226,7 @@ body {
   background: #ffffff 0% 0% no-repeat padding-box;
   top: -7px;
   left: -7px;
+  z-index: 5;
 }
 
 .labelCorner .topRight {
@@ -235,6 +237,7 @@ body {
   background: #ffffff 0% 0% no-repeat padding-box;
   top: -7px;
   right: -7px;
+  z-index: 5;
 }
 
 .labelCorner .bottomRight {
@@ -245,6 +248,7 @@ body {
   background: #ffffff 0% 0% no-repeat padding-box;
   bottom: -7px;
   right: -7px;
+  z-index: 5;
 }
 
 .labelCorner .bottomLeft {
@@ -255,4 +259,5 @@ body {
   background: #ffffff 0% 0% no-repeat padding-box;
   bottom: -7px;
   left: -7px;
+  z-index: 5;
 }
