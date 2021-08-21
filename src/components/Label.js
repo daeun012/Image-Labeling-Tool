@@ -1,4 +1,4 @@
-const Label = ({ data, imgSize }) => {
+const Label = ({ data, imgSize, selected }) => {
   const { x, y, x2, y2 } = data;
 
   const { imgWidth, imgHeight } = imgSize;
@@ -10,7 +10,16 @@ const Label = ({ data, imgSize }) => {
     height: Math.abs(Math.round((y2 - y) * imgHeight)),
   };
 
-  return <div className="label" style={dimensions}></div>;
+  return selected ? (
+    <div className="label" style={dimensions}>
+      <div className="topLeft" />
+      <div className="topRight" />
+      <div className="bottomRight" />
+      <div className="bottomLeft" />
+    </div>
+  ) : (
+    <div className="label" style={dimensions}></div>
+  );
 };
 
 export default Label;

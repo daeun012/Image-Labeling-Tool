@@ -202,17 +202,57 @@ body {
   position: absolute;
   top: 104px;
   left: 56px;
-  width: 100%;
-  width: 100%;
 }
 
 .label {
   position: absolute;
   user-select: none;
-  border: 2px solid #5668d9;
-  background-color: rgba(235, 237, 242, 0.5);
-  left: 1px;
-  top: 1px;
-  right: 1px;
-  bottom: 1px;
+  background: rgba(86, 104, 217, 0.2) 0% 0% no-repeat padding-box;
+  border: 3px solid #5668d9;
+}
+
+.labelCorner {
+  position: absolute;
+  user-select: none;
+  border: 3px solid #5668d9;
+}
+
+.labelCorner .topLeft {
+  position: absolute;
+  border: 3px solid #5668d9;
+  width: 16px;
+  height: 16px;
+  background: #ffffff 0% 0% no-repeat padding-box;
+  top: -7px;
+  left: -7px;
+}
+
+.labelCorner .topRight {
+  position: absolute;
+  border: 3px solid #5668d9;
+  width: 16px;
+  height: 16px;
+  background: #ffffff 0% 0% no-repeat padding-box;
+  top: -7px;
+  right: -7px;
+}
+
+.labelCorner .bottomRight {
+  position: absolute;
+  border: 3px solid #5668d9;
+  width: 16px;
+  height: 16px;
+  background: #ffffff 0% 0% no-repeat padding-box;
+  bottom: -7px;
+  right: -7px;
+}
+
+.labelCorner .bottomLeft {
+  position: absolute;
+  border: 3px solid #5668d9;
+  width: 16px;
+  height: 16px;
+  background: #ffffff 0% 0% no-repeat padding-box;
+  bottom: -7px;
+  left: -7px;
 }
