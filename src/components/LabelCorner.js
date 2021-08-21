@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LabelCorner = ({ index, data, imgSize, handleCornerDrag }) => {
+function LabelCorner({ index, data, imgSize, handleCornerDrag }) {
   const { x, y, x2, y2 } = data;
   const { imgWidth, imgHeight } = imgSize;
 
@@ -23,6 +23,6 @@ const LabelCorner = ({ index, data, imgSize, handleCornerDrag }) => {
       <div id="01" onMouseDown={onCornerGrabbed} className="bottomLeft" />
     </div>
   );
-};
+}
 
 export default LabelCorner;

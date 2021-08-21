@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Label from './Label';
+import LabelCorner from './LabelCorner';
 
 function Board({ mode }) {
   const canvasEl = useRef();
-  const [imgUrl, setImgUrl] = useState('');
+  const [imgUrl, setImgUrl] = useState(''); // 이미지 Url
   const [imgSize, setImgSize] = useState({
     imgWidth: 0,
     imgHeight: 0,
-  });
-  const [drag, setDrag] = useState(false);
-  const [targetIndex, setTargetIndex] = useState(null);
-  const [move, setMove] = useState([0, 0]);
-  const [labels, setLabels] = useState([]);
+  }); // 가져온 이미지 사이즈
+  const [drag, setDrag] = useState(false); // 드래그 활성화 Boolean 값
+  const [targetIndex, setTargetIndex] = useState(''); // 타겟으로 삼고 있는 인덱스
+  const [selectedIndex, setSelectedIndex] = useState([]); // 선택된 라벨들의 인덱스 값
+  const [move, setMove] = useState([0, 0]); // 라벨을 기준으로 한 마우스 좌표 값
+  const [labels, setLabels] = useState([]); // 생성된 라벨들
 
   useEffect(() => {
     // 이미지 가져오기
@@ -25,7 +27,7 @@ function Board({ mode }) {
       return;
     }
 
-    let index = targetIndex || 0;
+    let index = targetIndex === 0 || targetIndex ? targetIndex : labels.length - 1;
     const { x, y, x2, y2 } = labels[index];
 
     const updateLabel = {
@@ -38,15 +40,17 @@ function Board({ mode }) {
     const copyLabels = [...labels];
     copyLabels[index] = updateLabel;
     setLabels(copyLabels);
+
     setDrag(false);
+    setTargetIndex('');
   };
 
   const handleOnImgLoad = (e) => {
     setImgSize({ imgWidth: e.target.width, imgHeight: e.target.height });
   };
 
-  const handleMouseDown = (e) => {
-    if (e.button !== 0) {
+  const handleCanvasDragStart = (e) => {
+    if (e.button !== 0 || mode !== 'create') {
       return;
     }
 
@@ -56,38 +60,29 @@ function Board({ mode }) {
     const rect = canvasEl.current.getBoundingClientRect();
 
     // 마우스의 위치 구하기
+    // clientX : 브라우저를 기준으로 한 마우스의 포인터
     const mX = (e.clientX - rect.left) / imgWidth;
     const mY = (e.clientY - rect.top) / imgHeight;
 
-    if (mode === 'create') {
-      setTargetIndex(null);
-      const label = {
-        x: Math.min(1, Math.max(0, mX)),
-        y: Math.min(1, Math.max(0, mY)),
-        x2: Math.min(1, Math.max(0, mX)),
-        y2: Math.min(1, Math.max(0, mY)),
-      };
-      setLabels([label, ...labels]);
-      setDrag(true);
-      setMove([1, 1]);
-    }
-    if (mode === 'select') {
-      let isTarget = identifyLabel(mX, mY);
-      console.log(isTarget);
-      if (isTarget) {
-        setDrag(true);
-        setMove([mX, mY]);
-      } else {
-        setDrag(false);
-      }
-    }
+    const label = {
+      x: Math.min(1, Math.max(0, mX)),
+      y: Math.min(1, Math.max(0, mY)),
+      x2: Math.min(1, Math.max(0, mX)),
+      y2: Math.min(1, Math.max(0, mY)),
+    };
+
+    setLabels([...labels, label]);
+    setDrag(true); // 드래그 활성화
+    setMove([1, 1]);
   };
 
   const handleMouseMove = (e) => {
     if (!drag) {
       return;
     }
-    let index = targetIndex || 0;
+
+    let index = targetIndex === 0 || targetIndex ? targetIndex : labels.length - 1;
+
     const { x, y, x2, y2 } = labels[index];
 
     const { imgWidth, imgHeight } = imgSize;
@@ -101,30 +96,27 @@ function Board({ mode }) {
     let newX2;
     let newY2;
 
-    if (mode === 'select') {
+    if (move[0] === 0) {
+      newX = mX;
+      newX2 = x2;
+    } else if (move[0] === 1) {
+      newX = x;
+      newX2 = mX;
+    } else {
       newX = x + mX - move[0];
-      newY = y + mY - move[1];
       newX2 = x2 + mX - move[0];
-      newY2 = y2 + mY - move[1];
-      setMove([mX, mY]);
     }
 
-    if (mode === 'create') {
-      if (move[0] === 0) {
-        newX = mX;
-        newX2 = x2;
-      } else {
-        newX = x;
-        newX2 = mX;
-      }
-
-      if (move[1] === 0) {
-        newY = mY;
-        newY2 = y2;
-      } else {
-        newY = y;
-        newY2 = mY;
-      }
+    if (move[1] === 0) {
+      newY = mY;
+      newY2 = y2;
+    } else if (move[1] === 1) {
+      newY = y;
+      newY2 = mY;
+    } else {
+      newY = y + mY - move[1];
+      newY2 = y2 + mY - move[1];
+      setMove([mX, mY]);
     }
 
     const updateLabel = {
@@ -139,32 +131,79 @@ function Board({ mode }) {
     setLabels(copyLabels);
   };
 
-  const identifyLabel = (x, y) => {
-    // 선택한 라벨 식별하기
-    for (let i = 0; i < labels.length; i++) {
-      const label = labels[i];
-
-      if (x >= label.x && x <= label.x2 && y >= label.y && y <= label.y2) {
-        setTargetIndex(i);
-        return true;
-      }
+  const handleCornerDrag = (e, index) => {
+    if (e.button !== 0 || mode !== 'select') {
+      return;
     }
-    return false;
+
+    const id = e.target.id;
+    const move = [0, 0];
+    if (id.startsWith('0')) {
+      move[0] = 0;
+    } else {
+      move[0] = 1;
+    }
+    if (id.endsWith('0')) {
+      move[1] = 0;
+    } else {
+      move[1] = 1;
+    }
+    setMove(move);
+    setDrag(true);
+    setTargetIndex(index);
+  };
+
+  const handleLabelDrag = (e, index) => {
+    if (e.button !== 0 || mode !== 'select') {
+      return;
+    }
+
+    // 라벨 다중 선택 기능 : index가 추가 되어있지 않다면 selectedIndex에 추가한다.
+    selectedIndex.includes(index) || setSelectedIndex([...selectedIndex, index]);
+
+    const { imgWidth, imgHeight } = imgSize;
+
+    const rect = canvasEl.current.getBoundingClientRect();
+
+    const mX = (e.clientX - rect.left) / imgWidth;
+    const mY = (e.clientY - rect.top) / imgHeight;
+
+    setMove([mX, mY]);
+    setDrag(true);
+    setTargetIndex(index);
+  };
+
+  const onDoubleClickLabel = (e, index) => {
+    if (e.button !== 0 || mode !== 'select') {
+      return;
+    }
+    // 라벨 선택 취소 기능 : index가 추가 되어 있다면, 삭제한다.
+    selectedIndex.includes(index) && setSelectedIndex(selectedIndex.filter((item) => index !== item));
+  };
+
+  const handleKeyDown = (e) => {
+    // 라벨 삭제 기능
+    if (e.keyCode === 8 || e.keyCode === 46) {
+      let filterLabels = labels.filter((label, i) => !selectedIndex.includes(i));
+      setLabels(filterLabels);
+      setSelectedIndex([]);
+    }
   };
 
   useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('mousemove', handleMouseMove);
     return () => {
+      document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [handleMouseUp, handleMouseMove]);
+  }, [handleMouseUp, handleMouseMove, handleKeyDown]);
 
   return (
-    <div className="board" onMouseDown={handleMouseDown}>
+    <div className="board" onMouseDown={handleCanvasDragStart}>
       <img
-        className="board_img"
         ref={canvasEl}
         alt="img"
         src={imgUrl}
@@ -174,11 +213,19 @@ function Board({ mode }) {
           e.preventDefault();
         }}
       />
-      {mode === 'create'
-        ? labels.map((label, i) => <Label key={i} index={i} data={label} imgSize={imgSize} />)
-        : labels.map((label, i) =>
-            i === targetIndex ? <Label key={i} index={i} data={label} imgSize={imgSize} selected={true} /> : <Label key={i} index={i} data={label} imgSize={imgSize} selected={false} />
-          )}
+      {mode === 'create' && labels.map((label, i) => <Label key={i} index={i} data={label} imgSize={imgSize} />)}
+
+      {mode === 'select' &&
+        labels.map((label, i) =>
+          selectedIndex.includes(i) ? (
+            <div key={i}>
+              <Label index={i} data={label} imgSize={imgSize} handleLabelDrag={handleLabelDrag} onDoubleClickLabel={onDoubleClickLabel} />
+              <LabelCorner index={i} data={label} imgSize={imgSize} handleCornerDrag={handleCornerDrag} />
+            </div>
+          ) : (
+            <Label key={i} index={i} data={label} imgSize={imgSize} handleLabelDrag={handleLabelDrag} />
+          )
+        )}
     </div>
   );
 }

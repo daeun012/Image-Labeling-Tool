@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Label = ({ index, data, imgSize, handleLabelDrag }) => {
+function Label({ index, data, imgSize, handleLabelDrag, onDoubleClickLabel }) {
   const { x, y, x2, y2 } = data;
   const { imgWidth, imgHeight } = imgSize;
 
@@ -14,8 +14,11 @@ const Label = ({ index, data, imgSize, handleLabelDrag }) => {
   const onLabelGrabbed = (e) => {
     handleLabelDrag(e, index);
   };
+  const handleUnSelected = (e) => {
+    onDoubleClickLabel(e, index);
+  };
 
-  return handleLabelDrag ? <div className="label" style={dimensions} onMouseDown={onLabelGrabbed}></div> : <div className="label" style={dimensions}></div>;
-};
+  return handleLabelDrag ? <div className="label" style={dimensions} onMouseDown={onLabelGrabbed} onDoubleClick={handleUnSelected}></div> : <div className="label" style={dimensions}></div>;
+}
 
 export default Label;

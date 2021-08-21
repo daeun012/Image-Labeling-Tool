@@ -1,3 +1,5 @@
+import React from 'react';
+
 function ToolBar({ mode, activeMode }) {
   return (
     <div className="toolBar">
