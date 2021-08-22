@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Label from './Label';
 import LabelCorner from './LabelCorner';
 
@@ -22,28 +22,31 @@ function Board({ mode }) {
       .then((json) => setImgUrl(json.url));
   }, []);
 
-  const handleMouseUp = (e) => {
-    if (!drag) {
-      return;
-    }
+  const handleMouseUp = useCallback(
+    (e) => {
+      if (!drag) {
+        return;
+      }
 
-    let index = targetIndex === 0 || targetIndex ? targetIndex : labels.length - 1;
-    const { x, y, x2, y2 } = labels[index];
+      let index = targetIndex === 0 || targetIndex ? targetIndex : labels.length - 1;
+      const { x, y, x2, y2 } = labels[index];
 
-    const updateLabel = {
-      x: Math.min(x, x2),
-      y: Math.min(y, y2),
-      x2: Math.max(x, x2),
-      y2: Math.max(y, y2),
-    };
+      const updateLabel = {
+        x: Math.min(x, x2),
+        y: Math.min(y, y2),
+        x2: Math.max(x, x2),
+        y2: Math.max(y, y2),
+      };
 
-    const copyLabels = [...labels];
-    copyLabels[index] = updateLabel;
-    setLabels(copyLabels);
+      const copyLabels = [...labels];
+      copyLabels[index] = updateLabel;
+      setLabels(copyLabels);
 
-    setDrag(false);
-    setTargetIndex('');
-  };
+      setDrag(false);
+      setTargetIndex('');
+    },
+    [drag, labels, targetIndex]
+  );
 
   const handleOnImgLoad = (e) => {
     setImgSize({ imgWidth: e.target.width, imgHeight: e.target.height });
@@ -76,60 +79,63 @@ function Board({ mode }) {
     setMove([1, 1]);
   };
 
-  const handleMouseMove = (e) => {
-    if (!drag) {
-      return;
-    }
+  const handleMouseMove = useCallback(
+    (e) => {
+      if (!drag) {
+        return;
+      }
 
-    let index = targetIndex === 0 || targetIndex ? targetIndex : labels.length - 1;
+      let index = targetIndex === 0 || targetIndex ? targetIndex : labels.length - 1;
 
-    const { x, y, x2, y2 } = labels[index];
+      const { x, y, x2, y2 } = labels[index];
 
-    const { imgWidth, imgHeight } = imgSize;
+      const { imgWidth, imgHeight } = imgSize;
 
-    const rect = canvasEl.current.getBoundingClientRect();
-    const mX = (e.clientX - rect.left) / imgWidth;
-    const mY = (e.clientY - rect.top) / imgHeight;
+      const rect = canvasEl.current.getBoundingClientRect();
+      const mX = (e.clientX - rect.left) / imgWidth;
+      const mY = (e.clientY - rect.top) / imgHeight;
 
-    let newX;
-    let newY;
-    let newX2;
-    let newY2;
+      let newX;
+      let newY;
+      let newX2;
+      let newY2;
 
-    if (move[0] === 0) {
-      newX = mX;
-      newX2 = x2;
-    } else if (move[0] === 1) {
-      newX = x;
-      newX2 = mX;
-    } else {
-      newX = x + mX - move[0];
-      newX2 = x2 + mX - move[0];
-    }
+      if (move[0] === 0) {
+        newX = mX;
+        newX2 = x2;
+      } else if (move[0] === 1) {
+        newX = x;
+        newX2 = mX;
+      } else {
+        newX = x + mX - move[0];
+        newX2 = x2 + mX - move[0];
+      }
 
-    if (move[1] === 0) {
-      newY = mY;
-      newY2 = y2;
-    } else if (move[1] === 1) {
-      newY = y;
-      newY2 = mY;
-    } else {
-      newY = y + mY - move[1];
-      newY2 = y2 + mY - move[1];
-      setMove([mX, mY]);
-    }
+      if (move[1] === 0) {
+        newY = mY;
+        newY2 = y2;
+      } else if (move[1] === 1) {
+        newY = y;
+        newY2 = mY;
+      } else {
+        newY = y + mY - move[1];
+        newY2 = y2 + mY - move[1];
+        setMove([mX, mY]);
+      }
 
-    const updateLabel = {
-      x: Math.min(1, Math.max(0, newX)),
-      y: Math.min(1, Math.max(0, newY)),
-      x2: Math.min(1, Math.max(0, newX2)),
-      y2: Math.min(1, Math.max(0, newY2)),
-    };
+      const updateLabel = {
+        x: Math.min(1, Math.max(0, newX)),
+        y: Math.min(1, Math.max(0, newY)),
+        x2: Math.min(1, Math.max(0, newX2)),
+        y2: Math.min(1, Math.max(0, newY2)),
+      };
 
-    const copyLabels = [...labels];
-    copyLabels[index] = updateLabel;
-    setLabels(copyLabels);
-  };
+      const copyLabels = [...labels];
+      copyLabels[index] = updateLabel;
+      setLabels(copyLabels);
+    },
+    [drag, imgSize, labels, move, targetIndex]
+  );
 
   const handleCornerDrag = (e, index) => {
     if (e.button !== 0 || mode !== 'select') {
@@ -181,16 +187,21 @@ function Board({ mode }) {
     selectedIndex.includes(index) && setSelectedIndex(selectedIndex.filter((item) => index !== item));
   };
 
-  const handleKeyDown = (e) => {
-    // 라벨 삭제 기능
-    if (e.keyCode === 8 || e.keyCode === 46) {
-      let filterLabels = labels.filter((label, i) => !selectedIndex.includes(i));
-      setLabels(filterLabels);
-      setSelectedIndex([]);
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e) => {
+      // 라벨 삭제 기능
+      if (e.keyCode === 8 || e.keyCode === 46) {
+        let filterLabels = labels.filter((label, i) => !selectedIndex.includes(i));
+        setLabels(filterLabels);
+        setSelectedIndex([]);
+      }
+    },
+    [labels, selectedIndex]
+  );
 
   useEffect(() => {
+    let canvas = canvasEl.current;
+
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('mousemove', handleMouseMove);
