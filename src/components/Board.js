@@ -200,8 +200,6 @@ function Board({ mode }) {
   );
 
   useEffect(() => {
-    let canvas = canvasEl.current;
-
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('mousemove', handleMouseMove);
