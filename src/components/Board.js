@@ -190,7 +190,8 @@ function Board({ mode }) {
   const handleKeyDown = useCallback(
     (e) => {
       // 라벨 삭제 기능
-      if (e.keyCode === 8 || e.keyCode === 46) {
+
+      if (mode === 'select' && (e.keyCode === 8 || e.keyCode === 46)) {
         let filterLabels = labels.filter((label, i) => !selectedIndex.includes(i));
         setLabels(filterLabels);
         setSelectedIndex([]);
@@ -201,17 +202,13 @@ function Board({ mode }) {
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('mouseup', handleMouseUp);
-    document.addEventListener('mousemove', handleMouseMove);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [handleMouseUp, handleMouseMove, handleKeyDown]);
+  }, [handleKeyDown]);
 
   return (
-    <div className="board" onMouseDown={handleCanvasDragStart}>
+    <div className="board" onMouseDown={handleCanvasDragStart} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove}>
       <img
         ref={canvasEl}
         alt="img"
